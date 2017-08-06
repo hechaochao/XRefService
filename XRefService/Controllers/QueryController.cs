@@ -29,9 +29,18 @@ namespace RestfulApiService.Controllers
         public async Task<IActionResult> GetByUid(string uid)
         {
             string hashedUid = MD5Encryption.CalculateMD5Hash(uid);
-            var ut = await _db.XRefSpecObjects.Where(b => b.HashedUid == hashedUid)
-                                .Select(c => c.XRefSpecJson)
-                                .ToListAsync();
+            List<string> ut = null;
+            try
+            {
+                ut = await _db.XRefSpecObjects.Where(b => b.HashedUid == hashedUid)
+                               .Select(c => c.XRefSpecJson)
+                               .ToListAsync();
+            }catch(System.Exception e)
+            {
+                var t = e.Message;
+            }
+
+           
 
             //var response = new HttpResponseMessage();
             //var ms = new MemoryStream();
@@ -47,6 +56,29 @@ namespace RestfulApiService.Controllers
             return StatusCode(200, "[" + string.Join(",", ut) + "]");
         }
 
+        [HttpGet]
+        [Route("extension/{uid}")]
+        public async Task<IActionResult> GetByUidForExtension(string uid)
+        {
+            string hashedUid = MD5Encryption.CalculateMD5Hash(uid);
+            var ut = await _db.XRefSpecObjects.Where(b => b.HashedUid == hashedUid)
+                                .Select(c => c.Uid)
+                                .Take(20)
+                                .ToListAsync();
+
+            //var response = new HttpResponseMessage();
+            //var ms = new MemoryStream();
+            //var sw = new StreamWriter(ms);
+            //sw.Write("[");
+            //sw.Write(string.Join(",", ut));
+            //sw.Write("]");
+            //sw.Flush();
+            //ms.Position = 0;
+            //response.Content = new StreamContent(ms);
+            //response.StatusCode = HttpStatusCode.OK;
+            //return new ObjectResult(response);
+            return StatusCode(200, "[" + string.Join(",", ut) + "]");
+        }
         //[HttpPost]
         //[Route("")]
         //public async Task<IHttpActionResult> PostByUids([FromBody]string[] uids)

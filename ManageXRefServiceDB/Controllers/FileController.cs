@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DocAsCode.Build.Engine;
 using Microsoft.DocAsCode.Common;
+using Microsoft.DocAsCode.Plugins;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace ManageXRefServiceDB.Controllers
 {
     //[BasicAuthenticationAttribute("user", "user",
     //BasicRealm = "localhost")]
+    [Route("uids")]
     public class FileController : Controller
     {
         private XRefSpecDBContext _db;
@@ -25,14 +27,21 @@ namespace ManageXRefServiceDB.Controllers
             _environment = environment;
         }
 
-        // GET: File
-        [HttpGet]
-        public ActionResult UploadFile()
+        [HttpPost("add")]
+        public IActionResult Create([FromBody]XRefSpec spec)
         {
-            return View();
+            if(spec == null)
+            {
+                return BadRequest();
+            }
+
+            _db.XRefSpecObjects.Add(new XRefSpecObject {HashedUid=MD5Encryption.CalculateMD5Hash(spec.Uid),
+                Uid=spec.Uid, XRefSpecJson =JsonUtility.Serialize(spec) });
+            _db.SaveChanges();
+            return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(ICollection<IFormFile> files)
         {
             //var uploads = Path.Combine(_environment.ContentRootPath, "uploads");
@@ -43,16 +52,20 @@ namespace ManageXRefServiceDB.Controllers
                 {
                     using (var reader = new StreamReader(file.OpenReadStream()))
                     {
-                        tasks.Add(SaveData(reader));
+                        tasks.Add(SaveDataAsync(reader));
                     }
                 }
             }
             await Task.WhenAll(tasks);
-            ViewData["Message"] = "Upload successfully";
-            return View();
+            return StatusCode(200, "upload successfully");
         }
 
-        private async Task SaveData(TextReader reader)
+        private async Task SaveDataAsync(TextReader reader)
+        {
+            await Task.FromResult<int>(SaveData(reader));
+        }
+
+        private int SaveData(TextReader reader)
         {
 
             XRefMap xrefMap = YamlUtility.Deserialize<XRefMap>(reader);
@@ -61,10 +74,11 @@ namespace ManageXRefServiceDB.Controllers
                 XRefSpecObject xrefSpec = new XRefSpecObject();
                 xrefSpec.Uid = spec["uid"];
                 xrefSpec.HashedUid = MD5Encryption.CalculateMD5Hash(xrefSpec.Uid);
-                xrefSpec.XRefSpecJson = Newtonsoft.Json.JsonConvert.SerializeObject(spec);
+                xrefSpec.XRefSpecJson = JsonUtility.Serialize(spec);
                 _db.XRefSpecObjects.Add(xrefSpec);
             }
             _db.SaveChanges();
+            return 0;
         }
 
     }

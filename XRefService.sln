@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XRefService", "XRefService\XRefService.csproj", "{E06AAC0B-A6A9-4872-B89F-B4673873C71E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLib", "Database\DatabaseLib.csproj", "{81D1595B-3183-43C3-A200-4F7BC3E8D5C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLib", "DatabaseLib\DatabaseLib.csproj", "{81D1595B-3183-43C3-A200-4F7BC3E8D5C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManageXRefServiceDB", "test1\ManageXRefServiceDB.csproj", "{5E75BFC1-55E3-4D2D-883F-43D2D43E7CA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManageXRefServiceDB", "ManageXRefServiceDB\ManageXRefServiceDB.csproj", "{5E75BFC1-55E3-4D2D-883F-43D2D43E7CA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
